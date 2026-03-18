@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -31,7 +31,7 @@
             min-height: 100vh;
             margin: 0;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             transition: background 0.5s ease;
         }
@@ -170,9 +170,18 @@
             animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
+        /* View transition animations */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .view-section.active {
+            display: block;
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(1.1); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .confetti { position: absolute; pointer-events: none; z-index: 99; animation: confettiFall 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
@@ -226,124 +235,274 @@
         <div class="orb orb-2"></div>
     </div>
 
-    <div class="w-full max-w-md px-5 py-8">
-        <!-- Header -->
-        <header class="text-center mb-6 relative">
-            <div class="absolute right-0 top-0 icon-btn" onclick="toggleSound()" title="Toggle Sound">
-                <svg id="soundIcon" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 10v4a2 2 0 002 2h2.586l3.707 3.707A1 1 0 0015 19V5a1 1 0 00-1.707-.707L9.586 8H7a2 2 0 00-2 2z"></path>
-                </svg>
+    <div class="w-full max-w-md px-5 py-8 min-h-screen flex flex-col">
+        
+        <!-- MAIN GAME VIEW -->
+        <div id="view-home" class="view-section active flex-grow">
+            <!-- Header -->
+            <header class="text-center mb-6 relative">
+                <div class="absolute right-0 top-0 icon-btn" onclick="toggleSound()" title="Toggle Sound">
+                    <svg id="soundIcon" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 10v4a2 2 0 002 2h2.586l3.707 3.707A1 1 0 0015 19V5a1 1 0 00-1.707-.707L9.586 8H7a2 2 0 00-2 2z"></path>
+                    </svg>
+                </div>
+
+                <h1 class="text-4xl font-extrabold tracking-tighter mb-1 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-slate-500 drop-shadow-lg">
+                    AURA PUZZLE
+                </h1>
+                <p class="text-[var(--accent)] text-[9px] font-black uppercase tracking-[0.45em] mb-5 opacity-90">Crafted by Nabin Budha</p>
+                
+                <div class="flex justify-between items-center bg-white/[0.03] p-2.5 rounded-2xl border border-white/[0.05] shadow-inner">
+                    <div class="flex gap-2">
+                        <button onclick="changeDifficulty(3)" id="mode-3" class="btn-mode">
+                            3x3
+                            <span class="difficulty">Easy</span>
+                        </button>
+                        <button onclick="changeDifficulty(4)" id="mode-4" class="btn-mode active">
+                            4x4
+                            <span class="difficulty">Medium</span>
+                        </button>
+                        <button onclick="changeDifficulty(5)" id="mode-5" class="btn-mode">
+                            5x5
+                            <span class="difficulty">Hard</span>
+                        </button>
+                    </div>
+                    <div class="flex gap-2.5 px-3 border-l border-white/10">
+                        <div onclick="setTheme('indigo')" class="theme-dot bg-indigo-500 active" data-theme="indigo"></div>
+                        <div onclick="setTheme('emerald')" class="theme-dot bg-emerald-500" data-theme="emerald"></div>
+                        <div onclick="setTheme('rose')" class="theme-dot bg-rose-500" data-theme="rose"></div>
+                        <div onclick="setTheme('amber')" class="theme-dot bg-amber-500" data-theme="amber"></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="glass-panel py-3.5 text-center rounded-2xl">
+                    <div class="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Moves</div>
+                    <div id="moveCount" class="text-2xl font-bold text-white tracking-tight">0</div>
+                </div>
+                <div class="glass-panel py-3.5 text-center rounded-2xl">
+                    <div class="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Time</div>
+                    <div id="timer" class="text-2xl font-bold text-[var(--accent)] tracking-tight drop-shadow-md">00:00</div>
+                </div>
+                <div class="glass-panel py-3.5 text-center rounded-2xl">
+                    <div class="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Best</div>
+                    <div id="bestScore" class="text-2xl font-bold text-white tracking-tight opacity-70">--</div>
+                </div>
             </div>
 
-            <h1 class="text-4xl font-extrabold tracking-tighter mb-1 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-slate-500 drop-shadow-lg">
-                AURA PUZZLE
-            </h1>
-            <p class="text-[var(--accent)] text-[9px] font-black uppercase tracking-[0.45em] mb-5 opacity-90">Crafted by Nabin Budha</p>
-            
-            <div class="flex justify-between items-center bg-white/[0.03] p-2.5 rounded-2xl border border-white/[0.05] shadow-inner">
-                <div class="flex gap-2">
-                    <button onclick="changeDifficulty(3)" id="mode-3" class="btn-mode">
-                        3x3
-                        <span class="difficulty">Easy</span>
-                    </button>
-                    <button onclick="changeDifficulty(4)" id="mode-4" class="btn-mode active">
-                        4x4
-                        <span class="difficulty">Medium</span>
-                    </button>
-                    <button onclick="changeDifficulty(5)" id="mode-5" class="btn-mode">
-                        5x5
-                        <span class="difficulty">Hard</span>
-                    </button>
-                </div>
-                <div class="flex gap-2.5 px-3 border-l border-white/10">
-                    <div onclick="setTheme('indigo')" class="theme-dot bg-indigo-500 active" data-theme="indigo"></div>
-                    <div onclick="setTheme('emerald')" class="theme-dot bg-emerald-500" data-theme="emerald"></div>
-                    <div onclick="setTheme('rose')" class="theme-dot bg-rose-500" data-theme="rose"></div>
-                    <div onclick="setTheme('amber')" class="theme-dot bg-amber-500" data-theme="amber"></div>
-                </div>
+            <!-- Board -->
+            <div class="glass-panel p-2.5 shadow-2xl mb-8">
+                <div id="gridContainer" class="game-grid-container"></div>
             </div>
-        </header>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-3 gap-4 mb-6">
-            <div class="glass-panel py-3.5 text-center rounded-2xl">
-                <div class="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Moves</div>
-                <div id="moveCount" class="text-2xl font-bold text-white tracking-tight">0</div>
+            <button onclick="initGame(true)" class="w-full py-4 mb-10 rounded-2xl font-bold text-white uppercase tracking-[0.2em] text-xs bg-[var(--accent)] shadow-[0_0_20px_var(--accent-glow)] hover:brightness-110 active:scale-95 transition-all border-t border-white/30">
+                Reshuffle Board
+            </button>
+
+            <!-- Section 1: How to Play -->
+            <div class="glass-panel p-6 mb-6 border-white/10">
+                <h3 class="text-sm font-black uppercase tracking-[0.3em] text-[var(--accent)] mb-6 border-b border-white/5 pb-2">How to Play</h3>
+                
+                <div class="space-y-4">
+                    <div class="guide-step">
+                        <div class="step-num">1</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">Arrange the numbers in order. Start from <span class="text-white font-bold">1</span> at the top-left and finish at the bottom-right.</p>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-num">2</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">Tap a tile next to the <span class="text-white font-bold">empty space</span> to slide it into that spot.</p>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-num">3</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">Desktop user? Use <span class="text-[var(--accent)] font-bold">Arrow Keys</span> or <span class="text-[var(--accent)] font-bold">WASD</span> to move tiles faster.</p>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-num">4</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">Tiles turn <span class="text-emerald-400 font-bold">Green</span> when they are in the right place. Turn them all green to win!</p>
+                    </div>
+                </div>
             </div>
-            <div class="glass-panel py-3.5 text-center rounded-2xl">
-                <div class="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Time</div>
-                <div id="timer" class="text-2xl font-bold text-[var(--accent)] tracking-tight drop-shadow-md">00:00</div>
-            </div>
-            <div class="glass-panel py-3.5 text-center rounded-2xl">
-                <div class="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Best</div>
-                <div id="bestScore" class="text-2xl font-bold text-white tracking-tight opacity-70">--</div>
+
+            <!-- Section 2: Developer Introduction -->
+            <div class="glass-panel p-6 border-white/10 overflow-hidden relative">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-[var(--accent)] opacity-10 rounded-full blur-2xl"></div>
+                <h3 class="text-sm font-black uppercase tracking-[0.3em] text-[var(--accent)] mb-6 border-b border-white/5 pb-2">Developer</h3>
+                
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-white/20 to-transparent border border-white/20 flex items-center justify-center font-bold text-xl text-white shadow-lg">
+                        NB
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                            Nabin Budha <span class="dev-badge">Dev</span>
+                        </h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Class 11 Student | AI App & Web Developer</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Hello! I am <span class="text-white font-semibold">Nabin Budha</span>, a student in Class 11. I am passionate about building apps and websites using the power of AI.
+                    </p>
+                    <p class="text-xs text-slate-300 leading-relaxed italic opacity-80 border-l-2 border-[var(--accent)] pl-3">
+                        "This game was created with the help of AI, but the <span class="text-[var(--accent)] not-italic font-bold">creativity and vision</span> are mine. I believe in AI as a tool that helps us bring our unique ideas to life faster."
+                    </p>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Aura Puzzle v2.3</span>
+                    <button onclick="clearHistory()" class="text-[9px] text-rose-500 uppercase font-black hover:opacity-70 transition-opacity">Reset Progress</button>
+                </div>
             </div>
         </div>
 
-        <!-- Board -->
-        <div class="glass-panel p-2.5 shadow-2xl mb-8">
-            <div id="gridContainer" class="game-grid-container"></div>
-        </div>
+        <!-- CONTACT US VIEW -->
+        <div id="view-contact" class="view-section flex-grow">
+            <div class="glass-panel p-8 border-white/10 relative overflow-hidden">
+                <div class="absolute right-10 top-10 w-40 h-40 bg-[var(--accent)] opacity-10 rounded-full blur-3xl"></div>
+                <button onclick="navigate('home')" class="mb-6 text-[10px] text-[var(--accent)] uppercase font-black hover:opacity-70 transition-opacity flex items-center gap-1">
+                    <span>&larr;</span> Back to Game
+                </button>
+                <h2 class="text-2xl font-extrabold text-white mb-2 tracking-tight">Contact Us</h2>
+                <div class="w-10 h-1 bg-[var(--accent)] mb-6 rounded"></div>
+                
+                <div class="space-y-6 text-sm text-slate-300 leading-relaxed">
+                    <p class="text-xs">Have feedback, suggestions, or just want to say hi? Feel free to reach out to me! I am always happy to connect with fellow developers and players.</p>
 
-        <button onclick="initGame(true)" class="w-full py-4 mb-10 rounded-2xl font-bold text-white uppercase tracking-[0.2em] text-xs bg-[var(--accent)] shadow-[0_0_20px_var(--accent-glow)] hover:brightness-110 active:scale-95 transition-all border-t border-white/30">
-            Reshuffle Board
-        </button>
+                    <div class="flex flex-col gap-4 mt-6">
+                        <!-- Email Link -->
+                        <a href="mailto:nbudha679@gmail.com" class="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.08] transition-all group">
+                            <div class="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center text-white shadow-[0_0_15px_var(--accent-glow)] group-hover:scale-110 transition-transform flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div class="overflow-hidden">
+                                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Email Me</div>
+                                <div class="text-white font-semibold truncate">nbudha679@gmail.com</div>
+                            </div>
+                        </a>
 
-        <!-- Section 1: How to Play -->
-        <div class="glass-panel p-6 mb-6 border-white/10">
-            <h3 class="text-sm font-black uppercase tracking-[0.3em] text-[var(--accent)] mb-6 border-b border-white/5 pb-2">How to Play</h3>
-            
-            <div class="space-y-4">
-                <div class="guide-step">
-                    <div class="step-num">1</div>
-                    <p class="text-xs text-slate-300 leading-relaxed">Arrange the numbers in order. Start from <span class="text-white font-bold">1</span> at the top-left and finish at the bottom-right.</p>
-                </div>
-                <div class="guide-step">
-                    <div class="step-num">2</div>
-                    <p class="text-xs text-slate-300 leading-relaxed">Tap a tile next to the <span class="text-white font-bold">empty space</span> to slide it into that spot.</p>
-                </div>
-                <div class="guide-step">
-                    <div class="step-num">3</div>
-                    <p class="text-xs text-slate-300 leading-relaxed">Desktop user? Use <span class="text-[var(--accent)] font-bold">Arrow Keys</span> or <span class="text-[var(--accent)] font-bold">WASD</span> to move tiles faster.</p>
-                </div>
-                <div class="guide-step">
-                    <div class="step-num">4</div>
-                    <p class="text-xs text-slate-300 leading-relaxed">Tiles turn <span class="text-emerald-400 font-bold">Green</span> when they are in the right place. Turn them all green to win!</p>
+                        <!-- Facebook Link -->
+                        <a href="https://www.facebook.com/aesthetic.nabin" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.08] transition-all group">
+                            <div class="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center text-white shadow-[0_0_15px_rgba(24,119,242,0.4)] group-hover:scale-110 transition-transform flex-shrink-0">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path></svg>
+                            </div>
+                            <div class="overflow-hidden">
+                                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Connect on Facebook</div>
+                                <div class="text-white font-semibold truncate">@aesthetic.nabin</div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section 2: Developer Introduction -->
-        <div class="glass-panel p-6 mb-12 border-white/10 overflow-hidden relative">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-[var(--accent)] opacity-10 rounded-full blur-2xl"></div>
-            <h3 class="text-sm font-black uppercase tracking-[0.3em] text-[var(--accent)] mb-6 border-b border-white/5 pb-2">Developer</h3>
-            
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-white/20 to-transparent border border-white/20 flex items-center justify-center font-bold text-xl text-white shadow-lg">
-                    NB
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                        Nabin Budha <span class="dev-badge">Dev</span>
-                    </h3>
-                    <p class="text-[10px] text-slate-400 font-medium">Class 11 Student | AI App & Web Developer</p>
-                </div>
-            </div>
-            
-            <div class="space-y-3">
-                <p class="text-xs text-slate-300 leading-relaxed">
-                    Hello! I am <span class="text-white font-semibold">Nabin Budha</span>, a student in Class 11. I am passionate about building apps and websites using the power of AI.
-                </p>
-                <p class="text-xs text-slate-300 leading-relaxed italic opacity-80 border-l-2 border-[var(--accent)] pl-3">
-                    "This game was created with the help of AI, but the <span class="text-[var(--accent)] not-italic font-bold">creativity and vision</span> are mine. I believe in AI as a tool that helps us bring our unique ideas to life faster."
-                </p>
-            </div>
+        <!-- PRIVACY POLICY VIEW -->
+        <div id="view-privacy" class="view-section flex-grow">
+            <div class="glass-panel p-8 border-white/10 relative overflow-hidden">
+                <div class="absolute -left-10 -top-10 w-40 h-40 bg-[var(--accent)] opacity-10 rounded-full blur-3xl"></div>
+                <button onclick="navigate('home')" class="mb-6 text-[10px] text-[var(--accent)] uppercase font-black hover:opacity-70 transition-opacity flex items-center gap-1">
+                    <span>&larr;</span> Back to Game
+                </button>
+                <h2 class="text-2xl font-extrabold text-white mb-2 tracking-tight">Privacy Policy</h2>
+                <div class="w-10 h-1 bg-[var(--accent)] mb-6 rounded"></div>
+                
+                <div class="space-y-5 text-sm text-slate-300 leading-relaxed">
+                    <p>Your privacy is important to us. This policy outlines how <span class="text-white font-semibold">Aura Puzzle Pro</span> handles your data.</p>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-1">1. Data Collection</h3>
+                        <p class="text-xs">We do not collect, store, transmit, or share any personal information. This game operates entirely within your web browser without connecting to external databases.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-1">2. Local Storage</h3>
+                        <p class="text-xs">We utilize your browser's built-in Local Storage to save your game progress, such as your best completion times, move counts, and selected themes. This data never leaves your personal device. You can clear this data at any time using the "Reset Progress" button in the Developer section.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-1">3. Third-Party Services</h3>
+                        <p class="text-xs">This website does not integrate tracking cookies, analytics software, or third-party advertising scripts.</p>
+                    </div>
 
-            <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
-                <span class="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Aura Puzzle v2.1</span>
-                <button onclick="clearHistory()" class="text-[9px] text-rose-500 uppercase font-black hover:opacity-70 transition-opacity">Reset Progress</button>
+                    <div>
+                        <h3 class="text-white font-bold mb-1">4. Policy Changes</h3>
+                        <p class="text-xs">We reserve the right to modify this privacy policy at any time. Any changes will be updated directly on this page.</p>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- DISCLAIMER VIEW -->
+        <div id="view-disclaimer" class="view-section flex-grow">
+            <div class="glass-panel p-8 border-white/10 relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-rose-500 opacity-10 rounded-full blur-3xl"></div>
+                <button onclick="navigate('home')" class="mb-6 text-[10px] text-[var(--accent)] uppercase font-black hover:opacity-70 transition-opacity flex items-center gap-1">
+                    <span>&larr;</span> Back to Game
+                </button>
+                <h2 class="text-2xl font-extrabold text-white mb-2 tracking-tight">Disclaimer</h2>
+                <div class="w-10 h-1 bg-rose-500 mb-6 rounded"></div>
+                
+                <div class="space-y-5 text-sm text-slate-300 leading-relaxed">
+                    <div>
+                        <h3 class="text-white font-bold mb-1">1. "As-Is" Provision</h3>
+                        <p class="text-xs">Aura Puzzle Pro is provided "as is" and "as available" without warranties of any kind, either express or implied. The developer, Nabin Budha, does not guarantee that the game will be error-free or uninterrupted.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-1">2. AI Assistance</h3>
+                        <p class="text-xs">As noted in the developer introduction, the code for this game was generated and structured with the assistance of Artificial Intelligence. However, the core conceptual design, layout vision, and creative direction are solely the intellectual property of Nabin Budha.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-1">3. Liability</h3>
+                        <p class="text-xs">In no event shall the developer be held liable for any direct, indirect, incidental, or consequential damages arising out of the use or inability to use this software or website.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TERMS OF SERVICE VIEW -->
+        <div id="view-terms" class="view-section flex-grow">
+            <div class="glass-panel p-8 border-white/10 relative overflow-hidden">
+                <div class="absolute left-1/2 -top-10 w-40 h-40 bg-emerald-500 opacity-10 rounded-full blur-3xl transform -translate-x-1/2"></div>
+                <button onclick="navigate('home')" class="mb-6 text-[10px] text-[var(--accent)] uppercase font-black hover:opacity-70 transition-opacity flex items-center gap-1">
+                    <span>&larr;</span> Back to Game
+                </button>
+                <h2 class="text-2xl font-extrabold text-white mb-2 tracking-tight">Terms of Service</h2>
+                <div class="w-10 h-1 bg-emerald-500 mb-6 rounded"></div>
+                
+                <div class="space-y-5 text-sm text-slate-300 leading-relaxed">
+                    <p class="text-xs">By accessing or playing Aura Puzzle Pro, you agree to be bound by these Terms of Service.</p>
+
+                    <div>
+                        <h3 class="text-white font-bold mb-1">1. License to Play</h3>
+                        <p class="text-xs">You are granted a free, non-exclusive, non-transferable license to play the game for personal, non-commercial entertainment purposes.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-1">2. Intellectual Property</h3>
+                        <p class="text-xs">All visual designs, concepts, branding ("Aura Puzzle Pro"), and thematic elements are the intellectual property of Nabin Budha. You may not copy, distribute, or create derivative works without explicit permission.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-1">3. Acceptable Use</h3>
+                        <p class="text-xs">You agree not to use the website in any way that could damage, disable, overburden, or impair the server or network. Exploiting the game via scripts, bots, or automated software is discouraged.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Website Footer Navigation -->
+        <footer class="mt-8 pt-6 pb-4 border-t border-white/10 flex flex-wrap justify-center gap-x-6 gap-y-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-full text-center">
+            <a href="#home" onclick="navigate('home')" class="hover:text-[var(--accent)] transition-colors nav-link" data-target="home">Game</a>
+            <a href="#contact" onclick="navigate('contact')" class="hover:text-[var(--accent)] transition-colors nav-link" data-target="contact">Contact</a>
+            <a href="#privacy" onclick="navigate('privacy')" class="hover:text-[var(--accent)] transition-colors nav-link" data-target="privacy">Privacy</a>
+            <a href="#disclaimer" onclick="navigate('disclaimer')" class="hover:text-[var(--accent)] transition-colors nav-link" data-target="disclaimer">Disclaimer</a>
+            <a href="#terms" onclick="navigate('terms')" class="hover:text-[var(--accent)] transition-colors nav-link" data-target="terms">Terms</a>
+        </footer>
+
     </div>
 
     <!-- Win Modal -->
@@ -369,6 +528,34 @@
     </div>
 
     <script>
+        // --- Navigation Logic ---
+        function navigate(pageId) {
+            // Hide all sections
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show target section
+            const target = document.getElementById('view-' + pageId);
+            if (target) {
+                target.classList.add('active');
+            }
+
+            // Update active state on footer links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if(link.dataset.target === pageId) {
+                    link.classList.add('text-[var(--accent)]');
+                } else {
+                    link.classList.remove('text-[var(--accent)]');
+                }
+            });
+
+            // Scroll to top of the app container smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+
+        // --- Game Logic ---
         const STORAGE_KEY_SCORES = 'aura_best_scores';
         const STORAGE_KEY_THEME = 'aura_theme';
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -407,10 +594,12 @@
         }
 
         function clearHistory() {
-            localStorage.clear();
-            bestScores = { 3: '--', 4: '--', 5: '--' };
-            bestDisplay.innerText = '--';
-            location.reload();
+            if(confirm("Are you sure you want to delete all your best scores and progress?")) {
+                localStorage.clear();
+                bestScores = { 3: '--', 4: '--', 5: '--' };
+                bestDisplay.innerText = '--';
+                location.reload();
+            }
         }
 
         function setTheme(theme) {
@@ -431,14 +620,16 @@
 
         function playTone(freq, duration, type = 'sine', volume = 0.05) {
             if (!soundEnabled) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
         }
 
         function triggerHaptic() { if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(15); }
@@ -502,6 +693,12 @@
 
         function setupBoard(animateLoad) {
             gridContainer.innerHTML = ''; tileElements = {};
+            // Make sure the container has its width before calculating
+            if(gridContainer.clientWidth === 0) {
+                setTimeout(() => setupBoard(animateLoad), 50);
+                return;
+            }
+            
             const gap = 10; const tileSize = (gridContainer.clientWidth - (size + 1) * gap) / size;
             tiles.forEach((num, idx) => {
                 if (num !== null) {
@@ -538,7 +735,9 @@
         }
 
         window.addEventListener('keydown', (e) => {
-            if (isGameOver) return;
+            // Only process keyboard if we are on the game view
+            if (isGameOver || document.getElementById('view-home').classList.contains('active') === false) return;
+            
             const key = e.key.toLowerCase();
             const emptyIdx = tiles.indexOf(null);
             let targetIdx = -1;
@@ -619,9 +818,15 @@
 
         function closeModal() { document.getElementById('winModal').style.display = 'none'; initGame(true); }
 
-        window.onload = () => { loadSavedData(); initGame(true); };
+        window.onload = () => { 
+            loadSavedData(); 
+            navigate('home'); // Ensure home is selected visually on load
+            initGame(true); 
+        };
+        
         let rT; window.onresize = () => { clearTimeout(rT); rT = setTimeout(() => setupBoard(false), 100); };
     </script>
 </body>
 </html>
+
 
